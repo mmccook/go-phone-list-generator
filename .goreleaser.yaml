@@ -1,0 +1,109 @@
+# GoReleaser configuration
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: phone-generator-cli
+    main: .
+    binary: phone-generator
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Exclude invalid combinations
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE*
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^chore:'
+      - '^style:'
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
+    name: "{{ .ProjectName }}"
+  name_template: "{{.ProjectName}}-v{{.Version}}"
+  draft: false
+  prerelease: auto
+  mode: replace
+  footer: |
+    ## Installation
+
+    Download the appropriate binary for your platform from the assets below.
+
+    ### Linux / macOS
+    ```bash
+    # Extract the archive
+    tar -xzf phone-generator*.tar.gz
+
+    # Move to a location in your PATH
+    sudo mv phone-generator /usr/local/bin/
+
+    # Make it executable
+    chmod +x /usr/local/bin/phone-generator
+    ```
+
+    ### Windows
+    Extract the zip file and add the executable to your PATH.
+
+    ## Usage
+    ```bash
+    phone-generator -count=1000 -areacodes=631,561,446 -fields=firstname,lastname,email
+    ```
