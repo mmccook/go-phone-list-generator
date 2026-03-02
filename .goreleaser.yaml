@@ -1,7 +1,7 @@
 # GoReleaser configuration
 version: 2
 
-project_name: phone-list-generator-cli
+project_name: go-phone-list-generator
 
 before:
   hooks:
@@ -9,9 +9,9 @@ before:
     - go mod download
 
 builds:
-  - id: phone-generator-cli
+  - id: go-phone-list-generator
     main: .
-    binary: phone-generator
+    binary: phone-list-generator
     env:
       - CGO_ENABLED=0
     goos:
