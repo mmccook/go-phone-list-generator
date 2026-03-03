@@ -103,13 +103,12 @@ func generate(areaCodes []string, count, countryCode int, fields []Field, addrCa
 			areaCodeIndex++
 			_ = bar.Add(1)
 		} else {
-			// If phone is not possible, try next area code
 			areaCodeIndex++
 		}
 	}
 
 	_ = bar.Finish()
-	fmt.Println() // Add newline after progress bar
+	fmt.Println()
 
 	log.Printf("Done! Generated %d phone numbers in %s\n", count, fileName)
 	return nil

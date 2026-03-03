@@ -36,7 +36,11 @@ func TestNewPhone(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			phone := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, tt.format)
+			phone, err := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, tt.format)
+
+			if err != nil {
+				t.Fatalf("NewPhone returned error: %v", err)
+			}
 
 			if phone == nil {
 				t.Fatal("NewPhone returned nil")
@@ -66,28 +70,40 @@ func TestNewPhone(t *testing.T) {
 }
 
 func TestPhone_CountryCode(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 	if got := phone.CountryCode(); got != 1 {
 		t.Errorf("CountryCode() = %d, want 1", got)
 	}
 }
 
 func TestPhone_AreaCode(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 	if got := phone.AreaCode(); got != "631" {
 		t.Errorf("AreaCode() = %s, want 631", got)
 	}
 }
 
 func TestPhone_CentralOffice(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 	if got := phone.CentralOffice(); got != "555" {
 		t.Errorf("CentralOffice() = %s, want 555", got)
 	}
 }
 
 func TestPhone_LineNumber(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 	if got := phone.LineNumber(); got != "1234" {
 		t.Errorf("LineNumber() = %s, want 1234", got)
 	}
@@ -125,7 +141,10 @@ func TestPhone_FormatedNumber(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			phone := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, tt.format)
+			phone, err := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, tt.format)
+			if err != nil {
+				t.Fatalf("NewPhone returned error: %v", err)
+			}
 			got := phone.FormatedNumber()
 
 			if got != tt.wantContains {
@@ -143,7 +162,10 @@ func TestPhone_FormatedNumber(t *testing.T) {
 }
 
 func TestPhone_FullNumber(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 	fullNumber := phone.FullNumber()
 
 	if fullNumber == nil {
@@ -160,7 +182,10 @@ func TestPhone_FullNumber(t *testing.T) {
 }
 
 func TestPhone_SetFormat(t *testing.T) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		t.Fatalf("NewPhone returned error: %v", err)
+	}
 
 	// Initial format
 	initialFormat := phone.FormatedNumber()
@@ -206,7 +231,10 @@ func TestPhone_Possible(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			phone := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, phonenumbers.E164)
+			phone, err := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, phonenumbers.E164)
+			if err != nil {
+				t.Fatalf("NewPhone returned error: %v", err)
+			}
 			got := phone.Possible()
 
 			if got != tt.wantPossible {
@@ -242,7 +270,10 @@ func TestPhone_Valid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			phone := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, phonenumbers.E164)
+			phone, err := NewPhone(tt.countryCode, tt.areaCode, tt.centralOffice, tt.lineNumber, phonenumbers.E164)
+			if err != nil {
+				t.Fatalf("NewPhone returned error: %v", err)
+			}
 			// Valid() returns bool, just ensure it doesn't panic
 			_ = phone.Valid()
 		})
@@ -295,7 +326,7 @@ func TestRandomPhone_SingleAreaCode(t *testing.T) {
 
 func BenchmarkNewPhone(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+		_, _ = NewPhone(1, "631", "555", "1234", phonenumbers.E164)
 	}
 }
 
@@ -307,7 +338,10 @@ func BenchmarkRandomPhone(b *testing.B) {
 }
 
 func BenchmarkPhone_Possible(b *testing.B) {
-	phone := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	phone, err := NewPhone(1, "631", "555", "1234", phonenumbers.E164)
+	if err != nil {
+		b.Fatalf("NewPhone returned error: %v", err)
+	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		phone.Possible()
